@@ -1,0 +1,58 @@
+version: '3.7'
+services:
+  mysql:
+    container_name: mysql_app_vendeur_be
+    image: mysql:5.7.16
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: orange_app_vendeur
+      MYSQL_PASSWORD: root
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - "3309:3306"
+    networks:
+      - network_mysql_app_vendeur_be
+  php:
+    container_name: php_app_vendeur_be
+    build: ../docker
+    environment:
+      COMPOSER_MEMORY_LIMIT: -1
+    volumes:
+      - ../:/var/www/symfony:cached
+      - ../logs/symfony:/var/www/symfony/var/log:cached
+    depends_on:
+      - mysql
+    networks:
+      - network_mysql_app_vendeur_be
+      - network_php_app_vendeur_be
+  nginx:
+    container_name: nginx_app_vendeur_be
+    build: nginx
+    ports:
+      - "3001:80"
+    depends_on:
+      - php
+    networks:
+      - network_php_app_vendeur_be
+    volumes:
+      - ../logs/nginx:/var/log/nginx:cached
+      - ../:/var/www/symfony:cached
+  phpmyadmin:
+    container_name: phpmyadmin_app_vendeur_be
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 89:80
+    environment:
+      PMA_HOST: mysql_app_vendeur_be
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - network_mysql_app_vendeur_be
+
+networks:
+  network_mysql_app_vendeur_be:
+  network_php_app_vendeur_be:

@@ -1,0 +1,1 @@
+#!/bin/sh#certbot certonly --standalone -d example.com,www.example.com --email YOUR_EMAIL -n --agree-tos --expandcertbot certonly --standalone -d dev-admin.joodly.ch --email support@pixelstrade.com -n --agree-tos --expand/usr/sbin/nginx -g "daemon off;"
